@@ -1,5 +1,6 @@
 (module ffmpeg *
-(import chicken scheme foreign traversal image-processing scheme2c-compatibility imlib2 foreigners)
+(import chicken scheme foreign traversal linear-algebra
+        image-processing scheme2c-compatibility imlib2 foreigners)
 
 (define (byte-ref p offset)
  (foreign-lambda* unsigned-char

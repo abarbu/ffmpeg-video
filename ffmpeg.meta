@@ -9,7 +9,8 @@
  (synopsis "ffmpeg bindings")
  (depends setup-helper miscmacros check-errors condition-utils
           define-structure scheme2c-compatibility
-          traversal image-processing (imlib2 "0.14") foreigners)
+          traversal image-processing
+          (imlib2 "0.14") linear-algebra foreigners)
  (test-depends test)
  (files "ffmpeg-examples.scm"
         "ffmpeg.meta" 
