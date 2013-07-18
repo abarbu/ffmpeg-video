@@ -1,0 +1,10 @@
+;;;  -*- Hen -*-
+
+(use setup-helper-mod)
+
+(verify-extension-name "ffmpeg")
+
+(setup-shared-extension-module 'ffmpeg (extension-version "1.0")
+  #:inline? #t #:types? #t
+  #:compile-options '(-d2 -O2 -lavutil -lavformat -lavcodec -lz -lavutil -lm -lswscale -C -std=c99)
+  #:install-options '((examples "ffmpeg-examples.scm")))
