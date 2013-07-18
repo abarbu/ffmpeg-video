@@ -1,4 +1,4 @@
-= ffmpeg = =
+= ffmpeg =
 
 Chicken scheme egg with bindings for ffmpeg.
 
@@ -8,7 +8,7 @@ have only a single stream and audio is irrelevant.
 
 One day this egg will have documentation.
 
-=== License === ===
+=== License ===
 
    Copyright 2012, 2013 Andrei Barbu. All rights reserved.
    This program is free software: you can redistribute it and/or modify
