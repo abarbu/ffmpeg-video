@@ -1,24 +1,106 @@
-= ffmpeg =
 
-Chicken scheme egg with bindings for ffmpeg.
+= ffmpeg-video =
 
-Note that for now this egg binds only to a small subset of ffmpeg that
-deals with video. It is used for computer vision where video files
-have only a single stream and audio is irrelevant.
+Chicken scheme egg with bindings for ffmpeg designed for computer
+vision applications.
 
-One day this egg will have documentation.
+Note that this egg binds only to a small subset of ffmpeg that deals
+with video. It is used for computer vision where video files have only
+a single stream and audio is irrelevant. In addition this egg is
+designed to have frame-level accuracy, as such it doesn't support
+seeking and computing the video length is linear in the size of the
+video and very slow. Because of this it stores the computed video
+length of each video along with each video in a file named
+'<video>.video-length'.
+
+Note that in keeping with ffmpeg's screwed up convention the first
+frame is 1, not 0.
+
+Currently the main limitation of this egg is that it cannot encode
+video. One day it will be able to do so.
+
+=== API ===
+
+: (with-ffmpeg-video video-path f)
+
+Call f with an open ffmpeg at video-path.
+
+: (ffmpeg-open-video filename)
+: (ffmpeg-close-video video)
+
+Open and close a video.
+
+: (ffmpeg-video-finished? video)
+: (ffmpeg-video-frame-index video)
+: (ffmpeg-video-width video)
+: (ffmpeg-video-height video)
+: (ffmpeg-video-frame-rate video)
+
+Get information about an open video of an open video.
+
+: (ffmpeg-next-frame! video)
+
+Advance the frame of a video.
+
+: (ffmpeg-video-frame-data video)
+: (ffmpeg-video-frame-data-as-imlib video)
+
+Returns an image for the current frame as a PPM or an imlib image. See
+the scheme2c-compatibility or imlib eggs respectively.
+
+: (video-length video-pathname)
+
+Compute the length of a video in frames. Note that this is a very slow
+operation as it must inspect the entire video. Frame-level accuracy
+cannot be achieved by seeking. See the note at the beginning of this
+document about caching.
+
+: (for-each-frame f v)
+: (for-each-frame-but-last f v)
+: (for-each-frame-reversed f v)
+: (for-each-frame-indexed f v)
+: (for-each-frame-indexed-but-last f v)
+: (map-frame f v)
+: (map-frame-but-last f v)
+: (map-frame-indexed f v)
+: (map-frame-indexed-but-last f v)
+
+Walk over the frames of a video. Note that this does not fetch any
+data, even though decoding must happen for frame-level accuracy, it
+simply calls the function with one argument, the frame index. The
+indexed versions of these functions also pass an index (guaranteed to
+be 0-based) into the current movie.
+
+: (for-each-frame-pair individual-f pair-f video-name)
+: (map-frame-pair individual-f pair-f video-name)
+
+As above this only provides frame indices not data. individual-f is
+called once for each frame and pair-f is called on every pair of
+frames.
+
+: (for-each-imlib-frame-from-video-indexed f video)
+: (for-each-imlib-frame-from-video-indexed-but-last f video)
+: (for-each-imlib-frame-pair-from-video individual-f pair-f video)
+: (for-each-imlib-frame-pair-from-video-indexed individual-f pair-f video)
+: (map-imlib-frame-from-video-indexed f video)
+: (map-imlib-frame-pair-from-video individual-f pair-f video)
+
+Iterate over the video as above but the functions are called with both
+a frame number and an imlib image of the current frame. The indexed
+versions of these functions also pass an index (as the second
+arugment) (guaranteed to be 0-based) into the current movie.
 
 === License ===
 
-   Copyright 2012, 2013 Andrei Barbu. All rights reserved.
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright 2012, 2013 Andrei Barbu. All rights reserved.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 __NOTOC__

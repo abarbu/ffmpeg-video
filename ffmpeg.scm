@@ -1,6 +1,7 @@
 (module ffmpeg *
 (import chicken scheme foreign traversal linear-algebra
-        image-processing scheme2c-compatibility imlib2 foreigners)
+        image-processing scheme2c-compatibility imlib2 foreigners
+        srfi-1 posix extras)
 
 (define (byte-ref p offset)
  (foreign-lambda* unsigned-char
@@ -263,17 +264,34 @@ EOF
                     "C_return(ffmpeg_get_frame_as_imlib(video));")
    video)))
 
-(define (with-ffmpeg-video video-name f)
- (f (ffmpeg-open-video video-name)))
+(define (with-ffmpeg-video video-path f)
+ (f (ffmpeg-open-video video-path)))
 
-(define (video-length video-name)
+(define (compute-video-length video-path)
  (with-ffmpeg-video
-  video-name
+  video-path
   (lambda (video)
    (let loop ((i 1)) (if (ffmpeg-next-frame! video) (loop (+ i 1)) i)))))
 
-(define (video-first-frame video-name) 1)
-(define (video-last-frame video-name) (video-length video-name))
+(define (video-length video-path)
+ (let ((length-file (replace-extension video-path "video-length")))
+  (or (if (file-exists? length-file)
+         (let ((data (read-object-from-file length-file))
+               (mod-time (file-change-time video-path)))
+          (if (and (list? data) (= (length data) 2) (every number? data)
+                 (= (second data) mod-time))
+              (car data)
+              #f))
+         #f)
+     ;; * matters because we want the time computed before the
+     ;; video length to avoid race conditions
+     (let* ((mod-time (file-change-time video-path))
+            (l (compute-video-length video-path)))
+      (write-object-to-file (list l mod-time) length-file)
+      l))))
+
+(define (video-first-frame video-path) 1)
+(define (video-last-frame video-path) (video-length video-path))
 
 (define (for-each-frame f v)
  (for-each-m-n f (video-first-frame v) (video-last-frame v)))
@@ -297,9 +315,9 @@ EOF
  (for-each-m-n f (video-first-frame v) (- (video-last-frame v) 1)))
 (define (map-frame-but-last f v)
  (map-m-n f (video-first-frame v) (- (video-last-frame v) 1)))
-(define (map-frame-pair individual-f pair-f video-name)
- (let ((first-frame (video-first-frame video-name))
-       (last-frame (video-last-frame video-name)))
+(define (map-frame-pair individual-f pair-f video-path)
+ (let ((first-frame (video-first-frame video-path))
+       (last-frame (video-last-frame video-path)))
   (let loop ((n (+ first-frame 1))
 	     (prev (individual-f first-frame))
 	     (result '()))
@@ -307,9 +325,9 @@ EOF
        (reverse result)
        (let ((next (individual-f n)))
 	(loop (+ n 1) next (cons (pair-f prev next) result)))))))
-(define (for-each-frame-pair individual-f pair-f video-name)
- (let ((first-frame (video-first-frame video-name))
-       (last-frame (video-last-frame video-name)))
+(define (for-each-frame-pair individual-f pair-f video-path)
+ (let ((first-frame (video-first-frame video-path))
+       (last-frame (video-last-frame video-path)))
   (let loop ((n (+ first-frame 1))
 	     (prev (individual-f first-frame)))
    (unless (> n last-frame)
@@ -375,9 +393,9 @@ EOF
  ;; unlike the non-pair version
  ;; individual-f :: frame-nr -> index -> imlib -> a
  ;; pair-f :: a -> a -> b
- (define (for-each-frame-pair-indexed individual-f pair-f video-name)
-  (let ((first-frame (video-first-frame video-name))
-	(last-frame (video-last-frame video-name)))
+ (define (for-each-frame-pair-indexed individual-f pair-f video-path)
+  (let ((first-frame (video-first-frame video-path))
+	(last-frame (video-last-frame video-path)))
    (let loop ((n (+ first-frame 1))
 	      (i 1)
 	      (prev (individual-f first-frame 0)))

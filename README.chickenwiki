@@ -1,28 +1,110 @@
 [[tags: egg misc]]
 [[toc:]]
 
-Do not edit this page, it is maintained in the this package's [https://github.com/abarbu/ffmpeg github repository].
+This page is maintained in the this package's
+[[https://github.com/abarbu/ffmpeg|github repository]].
 
-= ffmpeg
+= ffmpeg-video
 
-Chicken scheme egg with bindings for ffmpeg.
+Chicken scheme egg with bindings for ffmpeg designed for computer
+vision applications.
 
-Note that for now this egg binds only to a small subset of ffmpeg that
-deals with video. It is used for computer vision where video files
-have only a single stream and audio is irrelevant.
+Note that this egg binds only to a small subset of ffmpeg that deals
+with video. It is used for computer vision where video files have only
+a single stream and audio is irrelevant. In addition this egg is
+designed to have frame-level accuracy, as such it doesn't support
+seeking and computing the video length is linear in the size of the
+video and very slow. Because of this it stores the computed video
+length of each video along with each video in a file named
+'<video>.video-length'.
 
-One day this egg will have documentation.
+Note that in keeping with ffmpeg's screwed up convention the first
+frame is 1, not 0.
+
+Currently the main limitation of this egg is that it cannot encode
+video. One day it will be able to do so.
+
+=== API
+
+<procedure>(with-ffmpeg-video video-path f)</procedure>
+
+Call f with an open ffmpeg at video-path.
+
+<procedure>(ffmpeg-open-video filename)</procedure>
+<procedure>(ffmpeg-close-video video)</procedure>
+
+Open and close a video.
+
+<procedure>(ffmpeg-video-finished? video)</procedure>
+<procedure>(ffmpeg-video-frame-index video)</procedure>
+<procedure>(ffmpeg-video-width video)</procedure>
+<procedure>(ffmpeg-video-height video)</procedure>
+<procedure>(ffmpeg-video-frame-rate video)</procedure>
+
+Get information about an open video of an open video.
+
+<procedure>(ffmpeg-next-frame! video)</procedure>
+
+Advance the frame of a video.
+
+<procedure>(ffmpeg-video-frame-data video)</procedure>
+<procedure>(ffmpeg-video-frame-data-as-imlib video)</procedure>
+
+Returns an image for the current frame as a PPM or an imlib image. See
+the scheme2c-compatibility or imlib eggs respectively.
+
+<procedure>(video-length video-pathname)</procedure>
+
+Compute the length of a video in frames. Note that this is a very slow
+operation as it must inspect the entire video. Frame-level accuracy
+cannot be achieved by seeking. See the note at the beginning of this
+document about caching.
+
+<procedure>(for-each-frame f v)</procedure>
+<procedure>(for-each-frame-but-last f v)</procedure>
+<procedure>(for-each-frame-reversed f v)</procedure>
+<procedure>(for-each-frame-indexed f v)</procedure>
+<procedure>(for-each-frame-indexed-but-last f v)</procedure>
+<procedure>(map-frame f v)</procedure>
+<procedure>(map-frame-but-last f v)</procedure>
+<procedure>(map-frame-indexed f v)</procedure>
+<procedure>(map-frame-indexed-but-last f v)</procedure>
+
+Walk over the frames of a video. Note that this does not fetch any
+data, even though decoding must happen for frame-level accuracy, it
+simply calls the function with one argument, the frame index. The
+indexed versions of these functions also pass an index (guaranteed to
+be 0-based) into the current movie.
+
+<procedure>(for-each-frame-pair individual-f pair-f video-name)</procedure>
+<procedure>(map-frame-pair individual-f pair-f video-name)</procedure>
+
+As above this only provides frame indices not data. individual-f is
+called once for each frame and pair-f is called on every pair of
+frames.
+
+<procedure>(for-each-imlib-frame-from-video-indexed f video)</procedure>
+<procedure>(for-each-imlib-frame-from-video-indexed-but-last f video)</procedure>
+<procedure>(for-each-imlib-frame-pair-from-video individual-f pair-f video)</procedure>
+<procedure>(for-each-imlib-frame-pair-from-video-indexed individual-f pair-f video)</procedure>
+<procedure>(map-imlib-frame-from-video-indexed f video)</procedure>
+<procedure>(map-imlib-frame-pair-from-video individual-f pair-f video)</procedure>
+
+Iterate over the video as above but the functions are called with both
+a frame number and an imlib image of the current frame. The indexed
+versions of these functions also pass an index (as the second
+arugment) (guaranteed to be 0-based) into the current movie.
 
 === License
 
-   Copyright 2012, 2013 Andrei Barbu. All rights reserved.
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright 2012, 2013 Andrei Barbu. All rights reserved.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
