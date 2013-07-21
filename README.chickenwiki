@@ -2,12 +2,13 @@
 [[toc:]]
 
 This page is maintained in the this package's
-[[https://github.com/abarbu/ffmpeg|github repository]].
+[[https://github.com/abarbu/ffmpeg-video|github repository]].
 
 = ffmpeg-video
 
-Chicken scheme egg with bindings for ffmpeg designed for computer
-vision applications.
+Chicken Scheme egg with bindings for ffmpeg designed for computer
+vision applications. In essence videos are treated as containers of
+images.
 
 Note that this egg binds only to a small subset of ffmpeg that deals
 with video. It is used for computer vision where video files have only

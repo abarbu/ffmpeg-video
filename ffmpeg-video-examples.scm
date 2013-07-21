@@ -1,5 +1,5 @@
 (use posix)
-(use imlib2 ffmpeg traversal)
+(use imlib2 ffmpeg-video traversal)
 
 (define video "/home/andrei/video-datasets/sentences/adverb1-The_person_picked+up_the_giraffe_quickly.mov")
 (video-length video)

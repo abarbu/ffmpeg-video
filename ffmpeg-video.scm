@@ -1,4 +1,4 @@
-(module ffmpeg *
+(module ffmpeg-video *
 (import chicken scheme foreign traversal linear-algebra
         image-processing scheme2c-compatibility imlib2 foreigners
         srfi-1 posix extras)

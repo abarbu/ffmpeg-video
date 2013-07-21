@@ -1,19 +1,19 @@
 ;;;  -*- Hen -*-
 
-((egg "ffmpeg.egg")
+((egg "ffmpeg-video.egg")
  (category math)
  (author "Andrei Barbu")
  (maintainer "Andrei Barbu")
  (license "LGPL")
  (doc-from-wiki)
- (synopsis "ffmpeg bindings")
+ (synopsis "ffmpeg bindings for computer vision applications")
  (depends setup-helper miscmacros check-errors condition-utils
           define-structure scheme2c-compatibility
           traversal image-processing
           (imlib2 "0.14") linear-algebra foreigners)
  (test-depends test)
- (files "ffmpeg-examples.scm"
-        "ffmpeg.meta" 
-        "ffmpeg.release-info"
-        "ffmpeg.scm" 
-        "ffmpeg.setup"))
+ (files "ffmpeg-video-examples.scm"
+        "ffmpeg-video.meta" 
+        "ffmpeg-video.release-info"
+        "ffmpeg-video.scm" 
+        "ffmpeg-video.setup"))
