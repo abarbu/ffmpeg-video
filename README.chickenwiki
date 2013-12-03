@@ -4,7 +4,7 @@
 This page is maintained in the this package's
 [[https://github.com/abarbu/ffmpeg-video|github repository]].
 
-= ffmpeg-video
+== ffmpeg-video
 
 Chicken Scheme egg with bindings for ffmpeg designed for computer
 vision applications. In essence videos are treated as containers of

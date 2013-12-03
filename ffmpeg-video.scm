@@ -41,7 +41,7 @@ struct ffmpeg_video_t {
 ;; TODO Change these to raise exceptions
 (foreign-declare #<<EOF
 int ffmpeg_first_video_stream(struct ffmpeg_video_t *video) {
-  if(av_find_stream_info(video->pFormatCtx)<0) {
+  if(avformat_find_stream_info(video->pFormatCtx, NULL)<0) {
     fprintf(stderr, "error: Can't get video stream information\n");
     exit(-1);
   }
@@ -59,7 +59,8 @@ AVCodecContext *ffmpeg_get_codec(struct ffmpeg_video_t *video) {
     fprintf(stderr,"error: Unsupported codec!");
     exit(-1);
   }
-  if(avcodec_open(pCodecCtx, pCodec)<0) {
+  AVDictionary *optionsDict = NULL;
+  if(avcodec_open2(pCodecCtx, pCodec, &optionsDict)<0) {
     fprintf(stderr,"error: Can't open codec!");
     exit(-1);
   }
@@ -210,7 +211,7 @@ EOF
    av_free(video->pFrameBGRA);
    av_free(video->pFrame);
    avcodec_close(video->pCodecCtx);
-   av_close_input_file(video->pFormatCtx);
+   avformat_close_input(&video->pFormatCtx);
    av_free_packet(&video->packet);
    video->videoFinished = 1;
    free(video);"))
